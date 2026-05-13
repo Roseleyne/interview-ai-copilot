@@ -1,0 +1,8 @@
+node_modules/
+cypress/videos/
+cypress/screenshots/
+reports/evidencias/videos/
+reports/evidencias/screenshots/
+.env
+.DS_Store
+.vscode/

@@ -1,0 +1,14 @@
+### Consultar post por ID
+GET https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+
+
+### Criar post
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{
+  "title": "Teste QA",
+  "body": "Criando teste de API pelo VS Code",
+  "userId": 1
+}

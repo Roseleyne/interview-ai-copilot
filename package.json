@@ -1,5 +1,19 @@
 {
+  "name": "qa-project",
+  "version": "1.0.0",
+  "description": "Projeto Cypress QA",
+  "main": "index.js",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
+  },
   "devDependencies": {
-    "cypress": "^15.15.0"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
+    "cypress": "^15.15.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3"
   }
 }
