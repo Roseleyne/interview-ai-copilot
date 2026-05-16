@@ -1,0 +1,35 @@
+{
+  "name": "playwright-qa-demo",
+  "version": "1.0.0",
+  "description": "Projeto MVP de QA moderno com Playwright, API testing, CI/CD e IA aplicada.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:e2e": "npx playwright test tests/e2e",
+    "test:api": "npx playwright test tests/api",
+    "test:ui": "npx playwright test --ui",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report",
+    "codegen": "npx playwright codegen",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "qa",
+    "playwright",
+    "automation",
+    "api-testing",
+    "e2e",
+    "ci-cd"
+  ],
+  "author": "Rose Duarte",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "latest",
+    "@playwright/test": "latest",
+    "dotenv": "latest",
+    "eslint": "latest",
+    "prettier": "latest"
+  }
+}
