@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview AI Copilot — Progress Dashboard</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --green: #3fb950;
+  --green-bg: #0d4429;
+  --blue: #58a6ff;
+  --blue-bg: #0c2d6b;
+  --amber: #d29922;
+  --amber-bg: #3d2b00;
+  --red: #f85149;
+  --red-bg: #3d0f0a;
+  --purple: #bc8cff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+.container { max-width: 900px; margin: 0 auto; }
+
+header { margin-bottom: 32px; }
+header h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+header p { font-size: 14px; color: var(--text-muted); }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.summary-card .num { font-size: 30px; font-weight: 700; }
+.summary-card .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.num-green { color: var(--green); }
+.num-blue { color: var(--blue); }
+.num-amber { color: var(--amber); }
+.num-red { color: var(--red); }
+
+.overall-bar-wrap { margin-bottom: 28px; }
+.overall-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.bar-track {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+
+.categories { display: grid; gap: 16px; }
+
+.cat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+.cat-header:hover { background: var(--surface2); }
+
+.cat-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.cat-icon { font-size: 18px; }
+.cat-meta { display: flex; align-items: center; gap: 10px; }
+.cat-pct { font-size: 13px; font-weight: 600; }
+.cat-bar-mini {
+  width: 80px;
+  height: 5px;
+  background: var(--surface2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.cat-bar-mini-fill { height: 100%; border-radius: 5px; transition: width 0.3s; }
+.chevron { font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
+.chevron.open { transform: rotate(180deg); }
+
+.questions-list {
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.questions-list.open { display: block; }
+
+.question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.question-row:last-child { border-bottom: none; }
+.question-row:hover { background: var(--surface2); }
+
+.q-status {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+.q-status.learned { background: var(--green); border-color: var(--green); color: #fff; }
+.q-status.reviewing { background: var(--amber); border-color: var(--amber); color: #fff; }
+.q-status.unknown { border-color: var(--border); }
+
+.q-content { flex: 1; }
+.q-text { font-size: 14px; line-height: 1.5; }
+.q-level {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+.level-basic { background: var(--green-bg); color: var(--green); }
+.level-intermediate { background: var(--amber-bg); color: var(--amber); }
+.level-advanced { background: var(--red-bg); color: var(--red); }
+
+.q-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.q-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.q-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.q-btn.active-learned { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.q-btn.active-reviewing { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.reset-area { margin-top: 28px; text-align: right; }
+.reset-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.reset-btn:hover { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🤖 Interview AI Copilot — Progress Dashboard</h1>
+    <p>Acompanhe seu domínio das perguntas de entrevista por categoria</p>
+  </header>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="num num-green" id="s-learned">0</div><div class="lbl">Dominadas</div></div>
+    <div class="summary-card"><div class="num num-amber" id="s-reviewing">0</div><div class="lbl">Revisando</div></div>
+    <div class="summary-card"><div class="num num-red" id="s-unknown">0</div><div class="lbl">Não vistas</div></div>
+    <div class="summary-card"><div class="num num-blue" id="s-total">0</div><div class="lbl">Total</div></div>
+  </div>
+
+  <div class="overall-bar-wrap">
+    <div class="overall-bar-label">
+      <span>Progresso geral</span>
+      <span id="overall-pct">0%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="overall-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> Dominada</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div> Revisando</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#30363d"></div> Não vista</div>
+  </div>
+
+  <div class="categories" id="categories"></div>
+
+  <div class="reset-area">
+    <button class="reset-btn" onclick="if(confirm('Resetar todo o progresso?')) { localStorage.removeItem(STORE_KEY); location.reload(); }">↺ Resetar progresso</button>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'interview-copilot-v1';
+
+const CATEGORIES = [
+  {
+    id: 'qa-fundamentals',
+    icon: '🧪',
+    name: 'QA Fundamentals',
+    color: '#3fb950',
+    questions: [
+      { id: 'q1', text: 'Qual a diferença entre verificação e validação?', level: 'basic' },
+      { id: 'q2', text: 'O que é teste caixa-branca vs caixa-preta?', level: 'basic' },
+      { id: 'q3', text: 'Explique a pirâmide de testes e quando aplicar cada camada.', level: 'intermediate' },
+      { id: 'q4', text: 'O que é teste de regressão e quando ele é executado?', level: 'basic' },
+      { id: 'q5', text: 'Como você prioriza casos de teste quando o tempo é limitado?', level: 'intermediate' },
+      { id: 'q6', text: 'Qual a diferença entre bug, defeito e falha?', level: 'basic' },
+    ]
+  },
+  {
+    id: 'automation',
+    icon: '🤖',
+    name: 'Test Automation',
+    color: '#58a6ff',
+    questions: [
+      { id: 'q7', text: 'Quais são os princípios do Page Object Model?', level: 'intermediate' },
+      { id: 'q8', text: 'Como você evita flaky tests em Playwright/Cypress?', level: 'intermediate' },
+      { id: 'q9', text: 'Qual a diferença entre Playwright e Cypress? Quando usar cada um?', level: 'intermediate' },
+      { id: 'q10', text: 'Como estruturar seletores resilientes que não quebram em mudanças de UI?', level: 'advanced' },
+      { id: 'q11', text: 'Como você implementa paralelismo em testes automatizados?', level: 'advanced' },
+      { id: 'q12', text: 'O que são data-driven tests e como implementá-los?', level: 'intermediate' },
+    ]
+  },
+  {
+    id: 'api-testing',
+    icon: '🔌',
+    name: 'API Testing',
+    color: '#bc8cff',
+    questions: [
+      { id: 'q13', text: 'Como você valida contratos de API (contract testing)?', level: 'advanced' },
+      { id: 'q14', text: 'Qual a diferença entre teste de API REST e GraphQL?', level: 'intermediate' },
+      { id: 'q15', text: 'Como testar autenticação OAuth2 em testes automatizados?', level: 'advanced' },
+      { id: 'q16', text: 'O que você verifica além do status code em respostas de API?', level: 'intermediate' },
+      { id: 'q17', text: 'Como simular serviços externos com mocks em testes de API?', level: 'intermediate' },
+    ]
+  },
+  {
+    id: 'performance',
+    icon: '⚡',
+    name: 'Performance Testing',
+    color: '#d29922',
+    questions: [
+      { id: 'q18', text: 'Qual a diferença entre load test, stress test e soak test?', level: 'intermediate' },
+      { id: 'q19', text: 'O que são percentis (p95, p99) e por que importam?', level: 'intermediate' },
+      { id: 'q20', text: 'Como identificar gargalos de performance em uma aplicação?', level: 'advanced' },
+      { id: 'q21', text: 'Quando usar JMeter vs k6 vs Gatling?', level: 'intermediate' },
+      { id: 'q22', text: 'Como definir thresholds de aceitação de performance?', level: 'advanced' },
+    ]
+  },
+  {
+    id: 'ci-cd',
+    icon: '🚀',
+    name: 'CI/CD & DevOps',
+    color: '#f85149',
+    questions: [
+      { id: 'q23', text: 'Como você integra testes automatizados em uma pipeline GitHub Actions?', level: 'intermediate' },
+      { id: 'q24', text: 'O que é shift-left testing e como aplicar na prática?', level: 'intermediate' },
+      { id: 'q25', text: 'Como garantir que testes não bloqueiem o deploy em falsos positivos?', level: 'advanced' },
+      { id: 'q26', text: 'Qual a sua estratégia para testes em ambientes efêmeros (Docker)?', level: 'advanced' },
+    ]
+  },
+  {
+    id: 'behavioral',
+    icon: '💬',
+    name: 'Comportamental',
+    color: '#8b949e',
+    questions: [
+      { id: 'q27', text: 'Descreva um bug crítico que você encontrou e como reportou.', level: 'basic' },
+      { id: 'q28', text: 'Como você lida com prazos curtos e cobertura de testes insuficiente?', level: 'intermediate' },
+      { id: 'q29', text: 'Como você convence devs a corrigirem bugs de baixa prioridade?', level: 'intermediate' },
+      { id: 'q30', text: 'Qual foi o maior desafio técnico que você resolveu em QA?', level: 'advanced' },
+      { id: 'q31', text: 'Como você se mantém atualizada com novas ferramentas e práticas de QA?', level: 'basic' },
+    ]
+  }
+];
+
+function loadState() {
+  const raw = localStorage.getItem(STORE_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+
+function saveState(state) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+function setStatus(qid, status) {
+  if (state[qid] === status) {
+    delete state[qid];
+  } else {
+    state[qid] = status;
+  }
+  saveState(state);
+  render();
+}
+
+function getStatus(qid) {
+  return state[qid] || 'unknown';
+}
+
+function render() {
+  let totalLearned = 0, totalReviewing = 0, totalAll = 0;
+
+  const container = document.getElementById('categories');
+  const prevOpen = {};
+  container.querySelectorAll('.questions-list.open').forEach(el => {
+    prevOpen[el.dataset.catId] = true;
+  });
+  container.innerHTML = '';
+
+  CATEGORIES.forEach(cat => {
+    let learned = 0, reviewing = 0;
+    cat.questions.forEach(q => {
+      const s = getStatus(q.id);
+      if (s === 'learned') learned++;
+      if (s === 'reviewing') reviewing++;
+    });
+    const total = cat.questions.length;
+    const pct = Math.round((learned / total) * 100);
+
+    totalLearned += learned;
+    totalReviewing += reviewing;
+    totalAll += total;
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+
+    const isOpen = !!prevOpen[cat.id];
+
+    card.innerHTML = `
+      <div class="cat-header" onclick="toggleCat('${cat.id}')">
+        <div class="cat-title">
+          <span class="cat-icon">${cat.icon}</span>
+          ${cat.name}
+        </div>
+        <div class="cat-meta">
+          <div class="cat-bar-mini">
+            <div class="cat-bar-mini-fill" style="width:${pct}%; background:${cat.color}"></div>
+          </div>
+          <span class="cat-pct" style="color:${cat.color}">${learned}/${total}</span>
+          <span class="chevron ${isOpen ? 'open' : ''}">▼</span>
+        </div>
+      </div>
+      <div class="questions-list ${isOpen ? 'open' : ''}" data-cat-id="${cat.id}">
+        ${cat.questions.map(q => {
+          const s = getStatus(q.id);
+          const statusIcon = s === 'learned' ? '✓' : s === 'reviewing' ? '~' : '';
+          return `
+          <div class="question-row">
+            <div class="q-status ${s}">${statusIcon}</div>
+            <div class="q-content">
+              <div class="q-text">${q.text}</div>
+              <span class="q-level level-${q.level}">${q.level}</span>
+            </div>
+            <div class="q-actions">
+              <button class="q-btn ${s === 'learned' ? 'active-learned' : ''}" onclick="event.stopPropagation(); setStatus('${q.id}', 'learned')">✓ Domino</button>
+              <button class="q-btn ${s === 'reviewing' ? 'active-reviewing' : ''}" onclick="event.stopPropagation(); setStatus('${q.id}', 'reviewing')">↻ Revisar</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  const totalUnknown = totalAll - totalLearned - totalReviewing;
+  const overallPct = Math.round((totalLearned / totalAll) * 100);
+
+  document.getElementById('s-learned').textContent = totalLearned;
+  document.getElementById('s-reviewing').textContent = totalReviewing;
+  document.getElementById('s-unknown').textContent = totalUnknown;
+  document.getElementById('s-total').textContent = totalAll;
+  document.getElementById('overall-pct').textContent = overallPct + '%';
+  document.getElementById('overall-bar').style.width = overallPct + '%';
+}
+
+function toggleCat(catId) {
+  const list = document.querySelector(`.questions-list[data-cat-id="${catId}"]`);
+  const chevron = list.previousElementSibling.querySelector('.chevron');
+  list.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+render();
+</script>
+</body>
+</html>

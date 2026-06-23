@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Progress — Roseleyne</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f6f8fa; color: #24292f; padding: 20px; }
+
+h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #57606a; margin-bottom: 20px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; padding: 14px; text-align: center; }
+.stat-card .num { font-size: 28px; font-weight: 600; color: #0969da; }
+.stat-card .lbl { font-size: 11px; color: #57606a; margin-top: 4px; }
+.stat-card .baseline { font-size: 10px; color: #8c959f; margin-top: 2px; }
+
+.section { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.section h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+.badge-green { background: #dafbe1; color: #116329; }
+.badge-blue { background: #ddf4ff; color: #0550ae; }
+.badge-amber { background: #fff8c5; color: #7d4e00; }
+.badge-purple { background: #fbefff; color: #6e40c9; }
+
+.img-stats { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.img-stats img { max-width: 100%; border-radius: 8px; }
+
+.week-grid { display: grid; gap: 8px; }
+.day-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid #d0d7de; border-radius: 8px; background: #f6f8fa; }
+.day-name { font-size: 12px; font-weight: 600; color: #57606a; width: 60px; flex-shrink: 0; padding-top: 2px; }
+.tasks-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.task-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+.chk { width: 16px; height: 16px; border: 1.5px solid #d0d7de; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.15s; background: #fff; }
+.chk.done { background: #1a7f37; border-color: #1a7f37; }
+.chk.done::after { content: '✓'; color: #fff; font-size: 10px; line-height: 1; }
+.task-txt { color: #24292f; line-height: 1.5; }
+.task-txt.done { color: #8c959f; text-decoration: line-through; }
+.tag { font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; font-weight: 500; display: inline-block; }
+.tag-commit { background: #dafbe1; color: #116329; }
+.tag-pr { background: #ddf4ff; color: #0550ae; }
+.tag-issue { background: #fff8c5; color: #7d4e00; }
+.tag-proj { background: #fbefff; color: #6e40c9; }
+
+.progress-wrap { margin-bottom: 16px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #57606a; margin-bottom: 6px; }
+.progress-bar { height: 6px; background: #d0d7de; border-radius: 6px; overflow: hidden; }
+.progress-fill { height: 100%; background: #1a7f37; border-radius: 6px; transition: width 0.4s; }
+
+.reset-btn { background: none; border: 1px solid #d0d7de; border-radius: 6px; padding: 4px 12px; font-size: 12px; color: #57606a; cursor: pointer; margin-top: 12px; }
+.reset-btn:hover { background: #f6f8fa; }
+
+.updated { font-size: 11px; color: #8c959f; text-align: right; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>📊 GitHub Progress — Roseleyne</h1>
+<p class="subtitle">Painel de acompanhamento semanal · github.com/Roseleyne</p>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="num" id="s-commits">55</div>
+    <div class="lbl">Commits/ano</div>
+    <div class="baseline">meta: 120+</div>
+  </div>
+  <div class="stat-card">
+    <div class="num" id="s-prs">0</div>
+    <div class="lbl">Pull Requests</div>
+    <div class="baseline">meta: 5+</div>
+  </div>
+  <div class="stat-card">
+    <div class="num" id="s-issues">0</div>
+    <div class="lbl">Issues abertas</div>
+    <div class="baseline">meta: 4+</div>
+  </div>
+  <div class="stat-card">
+    <div class="num" id="s-stars">9</div>
+    <div class="lbl">Stars</div>
+    <div class="baseline">meta: 15+</div>
+  </div>
+  <div class="stat-card">
+    <div class="num" id="s-contrib">0</div>
+    <div class="lbl">Repos contrib.</div>
+    <div class="baseline">meta: 3+</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Stats ao vivo <span class="badge badge-green">auto-atualizado</span></h2>
+  <div class="img-stats">
+    <img src="https://github-readme-stats.vercel.app/api?username=Roseleyne&show_icons=true&theme=default&hide_border=true&count_private=true&include_all_commits=true&locale=pt-br" alt="GitHub stats de Roseleyne" onerror="this.style.display='none'">
+    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Roseleyne&layout=compact&theme=default&hide_border=true&locale=pt-br" alt="Linguagens mais usadas" onerror="this.style.display='none'">
+    <img src="https://github-readme-streak-stats.herokuapp.com/?user=Roseleyne&theme=default&hide_border=true&locale=pt_BR" alt="Streak de commits" onerror="this.style.display='none'">
+  </div>
+</div>
+
+<div class="section">
+  <h2>Plano semanal <span class="badge badge-blue" id="progress-badge">0 / 11</span></h2>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Progresso da semana</span><span id="pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="week-grid" id="week-grid"></div>
+
+  <button class="reset-btn" onclick="resetWeek()">↺ Reiniciar semana</button>
+  <p class="updated" id="last-reset"></p>
+</div>
+
+<script>
+const PLAN = [
+  { day: "Segunda", tasks: [
+    { text: "Commit: pequena melhoria num projeto (README, refactor, fix)", tag: "commit", cls: "tag-commit" },
+    { text: "Explore goodfirstissue.dev — encontre 1 issue para a semana", tag: "issue", cls: "tag-issue" }
+  ]},
+  { day: "Terça", tasks: [
+    { text: "Commit: adicione .gitignore, LICENSE ou CONTRIBUTING a um repo", tag: "commit", cls: "tag-commit" },
+    { text: "Planeje adicionar JS funcional num projeto HTML seu", tag: "projeto", cls: "tag-proj" }
+  ]},
+  { day: "Quarta", tasks: [
+    { text: "Commit: inicie a implementação JS do projeto da terça", tag: "commit", cls: "tag-commit" },
+    { text: "Abra 1 issue real em projeto open source que você usa", tag: "issue", cls: "tag-issue" }
+  ]},
+  { day: "Quinta", tasks: [
+    { text: "Commit: adicione screenshot/GIF ao README de 1 projeto seu", tag: "commit", cls: "tag-commit" },
+    { text: "Procure 1 PR simples (typo, doc, tradução) no GitHub", tag: "pr", cls: "tag-pr" }
+  ]},
+  { day: "Sexta", tasks: [
+    { text: "Commit: finalize ou avance a feature JS da semana", tag: "commit", cls: "tag-commit" },
+    { text: "Envie o PR encontrado na quinta", tag: "pr", cls: "tag-pr" }
+  ]},
+  { day: "Sábado", tasks: [
+    { text: "Expanda o projeto JS ou inicie algo novo em TypeScript/Python", tag: "projeto", cls: "tag-proj" }
+  ]},
+  { day: "Domingo", tasks: [
+    { text: "Revisão: veja o streak, planeje commits da próxima semana", tag: "projeto", cls: "tag-proj" }
+  ]}
+];
+
+const TOTAL = PLAN.reduce((s, d) => s + d.tasks.length, 0);
+
+function getWeekKey() {
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  return d.getFullYear() + '-W' + Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+}
+
+function loadState() {
+  const raw = localStorage.getItem('gh-dash-v2');
+  if (!raw) return { week: '', checks: {}, resetDate: '' };
+  return JSON.parse(raw);
+}
+
+function saveState(state) {
+  localStorage.setItem('gh-dash-v2', JSON.stringify(state));
+}
+
+let state = loadState();
+if (state.week !== getWeekKey()) {
+  state = { week: getWeekKey(), checks: {}, resetDate: new Date().toLocaleDateString('pt-BR') };
+  saveState(state);
+}
+
+function renderGrid() {
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+
+  PLAN.forEach((d, di) => {
+    const row = document.createElement('div');
+    row.className = 'day-row';
+
+    const dn = document.createElement('div');
+    dn.className = 'day-name';
+    dn.textContent = d.day;
+    row.appendChild(dn);
+
+    const col = document.createElement('div');
+    col.className = 'tasks-col';
+
+    d.tasks.forEach((t, ti) => {
+      const key = di + '-' + ti;
+      const item = document.createElement('div');
+      item.className = 'task-item';
+
+      const chk = document.createElement('div');
+      chk.className = 'chk' + (state.checks[key] ? ' done' : '');
+      chk.setAttribute('role', 'checkbox');
+      chk.setAttribute('aria-checked', state.checks[key] ? 'true' : 'false');
+      chk.onclick = () => {
+        state.checks[key] = !state.checks[key];
+        saveState(state);
+        renderGrid();
+        updateProgress();
+      };
+
+      const txt = document.createElement('span');
+      txt.className = 'task-txt' + (state.checks[key] ? ' done' : '');
+      txt.innerHTML = t.text + ' <span class="tag ' + t.cls + '">' + t.tag + '</span>';
+
+      item.appendChild(chk);
+      item.appendChild(txt);
+      col.appendChild(item);
+    });
+
+    row.appendChild(col);
+    grid.appendChild(row);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(state.checks).filter(Boolean).length;
+  const pct = Math.round((done / TOTAL) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('progress-badge').textContent = done + ' / ' + TOTAL;
+}
+
+function resetWeek() {
+  state = { week: getWeekKey(), checks: {}, resetDate: new Date().toLocaleDateString('pt-BR') };
+  saveState(state);
+  renderGrid();
+  const el = document.getElementById('last-reset');
+  el.textContent = 'Reiniciado em ' + state.resetDate;
+}
+
+if (state.resetDate) {
+  document.getElementById('last-reset').textContent = 'Semana iniciada em ' + state.resetDate;
+}
+
+renderGrid();
+</script>
+</body>
+</html>
